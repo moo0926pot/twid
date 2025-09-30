@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>로스트아크 스타일 트친소</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <style>
+    :root{
+      --primary: #3b82f6;
+      --secondary: #60a5fa;
+      --accent: #0ea5e9;
+      --bg: #f8fafc;
+      --panel-bg: rgba(255, 255, 255, 0.95);
+      --card-bg: rgba(248, 250, 252, 0.98);
+      --border: rgba(226, 232, 240, 0.8);
+      --text-primary: #0f172a;
+      --text-secondary: #64748b;
+      --shadow: rgba(15, 23, 42, 0.08);
+      --accent-glow: rgba(59, 130, 246, 0.15);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    html, body {
+      min-height: 100%; 
+      background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 50%, #f8fafc 100%);
+      color: var(--text-primary); 
+      font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+
+    .container {
+      min-height: 100%; 
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      gap: 20px;
+    }
+
+    .frame {
+      position: relative; 
+      width: 1280px; 
+      height: 720px; 
+      overflow: hidden;
+      border-radius: 16px; 
+      box-shadow: 
+        0 20px 60px rgba(15, 23, 42, 0.12),
+        0 8px 24px rgba(15, 23, 42, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.5);
+      background: #ffffff;
+    }
+
+    /* 배경 */
+    .bg {
+      position: absolute; 
+      inset: 0; 
+      overflow: hidden; 
+      z-index: 0;
+    }
+    
+    .bg img {
+      position: absolute; 
+      inset: 0; 
+      width: 100%; 
+      height: 100%; 
+      object-fit: cover;
+    }
+    
+    .bg::after {
+      content: ""; 
+      position: absolute; 
+      inset: 0;
+      background: 
+        linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.5) 50%, rgba(255, 255, 255, 0.92) 100%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 30%, rgba(255, 255, 255, 0.3) 100%);
+      pointer-events: none;
+    }
+
+    /* 캐릭터 */
+    .character-area {
+      position: absolute; 
+      left: 40px; 
+      bottom: 40px; 
+      width: 350px;
+      height: 500px;
+      z-index: 1;
+      display: flex;
+      align-items: flex-end;
+    }
+    
+    .character-img {
+      max-height: 100%;
+      max-width: 100%;
+      object-fit: contain;
+      filter: drop-shadow(0 20px 40px rgba(15, 23, 42, 0.15));
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    .character-img:hover {
+      transform: scale(1.02);
+    }
+
+    /* 우측 패널 */
+    .panel {
+      position: absolute; 
+      right: 24px; 
+      top: 24px; 
+      bottom: 24px;
+      width: 460px; 
+      z-index: 2;
+      background: var(--panel-bg);
+      backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      display: flex; 
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 
+        0 10px 40px rgba(15, 23, 42, 0.1),
+        0 4px 12px rgba(15, 23, 42, 0.05),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    }
+
+    .panel-header {
+      padding: 24px;
+      background: linear-gradient(180deg, rgba(59, 130, 246, 0.05) 0%, transparent 100%);
+      border-bottom: 1px solid var(--border);
+      position: relative;
+    }
+
+    .panel-header::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 24px;
+      right: 24px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--primary), transparent);
+      opacity: 0.3;
+    }
+
+    .profile-main {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      position: relative;
+    }
+
+    .profile-main::before {
+      content: "";
+      position: absolute;
+      inset: -200%;
+      background: linear-gradient(120deg, rgba(255,255,255,0) 40%, rgba(255,255,255,.15) 50%, rgba(255,255,255,0) 60%);
+      transform: rotate(20deg);
+      animation: shimmer 3.6s linear infinite;
+      pointer-events: none;
+    }
+
+    .profile-main::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        radial-gradient(circle at 20% 30%, rgba(59, 130, 246, 0.25), rgba(59, 130, 246, 0) 30%),
+        radial-gradient(circle at 80% 20%, rgba(96, 165, 250, 0.2), rgba(96, 165, 250, 0) 30%),
+        radial-gradient(circle at 65% 75%, rgba(59, 130, 246, 0.3), rgba(59, 130, 246, 0) 30%),
+        radial-gradient(circle at 40% 60%, rgba(96, 165, 250, 0.15), rgba(96, 165, 250, 0) 30%);
+      background-size: 180px 180px, 150px 150px, 160px 160px, 130px 130px;
+      animation: twinkle 4s ease-in-out infinite alternate;
+      mix-blend-mode: screen;
+      opacity: 0.35;
+    }
+
+    @keyframes shimmer {
+      0% { transform: translateX(-30%) rotate(20deg); }
+      100% { transform: translateX(30%) rotate(20deg); }
+    }
+
+    @keyframes twinkle {
+      0% { opacity: 0.15; filter: hue-rotate(0deg); }
+      100% { opacity: 0.45; filter: hue-rotate(30deg); }
+    }
+
+    .avatar-wrapper {
+      position: relative;
+    }
+
+    .avatar {
+      width: 72px; 
+      height: 72px; 
+      border-radius: 12px;
+      object-fit: cover;
+      border: 2px solid var(--primary);
+      cursor: pointer;
+      box-shadow: 0 4px 12px var(--accent-glow);
+    }
+
+    .avatar-glow {
+      position: absolute;
+      inset: -4px;
+      border-radius: 10px;
+      background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+      z-index: -1;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.5; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.1); }
+    }
+
+    .profile-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .username {
+      font-weight:700; line-height:1.2;
+      min-width:0;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+
+    .bio {
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.4;
+    }
+
+    .tags {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+      margin-top: 8px;
+    }
+
+    .tag {
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.05));
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      padding: 4px 12px;
+      border-radius: 6px;
+      font-weight: 600;
+      color: var(--primary);
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .tag:hover {
+      background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(239, 68, 68, 0.1));
+      border-color: rgba(239, 68, 68, 0.5);
+      color: #ef4444;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(239, 68, 68, 0.2);
+    }
+
+    .tag:hover::after {
+      content: "✕";
+      position: absolute;
+      right: 4px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 10px;
+      font-weight: bold;
+    }
+
+    .panel-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px 24px;
+    }
+
+    .panel-content::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .panel-content::-webkit-scrollbar-track {
+      background: rgba(226, 232, 240, 0.3);
+      border-radius: 4px;
+    }
+
+    .panel-content::-webkit-scrollbar-thumb {
+      background: var(--primary);
+      border-radius: 4px;
+      border: 2px solid transparent;
+      background-clip: padding-box;
+    }
+
+    .section {
+      margin-bottom: 24px;
+    }
+
+    .section-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(245, 158, 11, 0.2);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-title::before {
+      content: "▸";
+      color: var(--primary);
+    }
+
+    /* 주력 캐릭터 */
+    .squad {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+    }
+
+    .unit {
+      aspect-ratio: 1;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 2px solid var(--border);
+      background: var(--card-bg);
+      position: relative;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05);
+    }
+
+    .unit:hover {
+      border-color: var(--primary);
+      transform: translateY(-4px);
+      box-shadow: 0 8px 20px rgba(59, 130, 246, 0.15);
+    }
+
+    .unit img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* 정보 카드 */
+    .info-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px;
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+    }
+
+    .info-row {
+      display: grid;
+      grid-template-columns: 100px 1fr;
+      gap: 12px;
+      padding: 7px 0;
+      border-bottom: 1px solid rgba(226, 232, 240, 0.6);
+      align-items: center;
+    }
+
+    .info-row:last-child {
+      border-bottom: none;
+    }
+
+    .info-label {
+      color: var(--text-secondary);
+      font-weight: 600;
+    }
+
+    .info-value {
+      color: var(--text-primary);
+      word-break: break-word;
+    }
+
+    /* 장식 요소 */
+    .corner-deco {
+      position: absolute;
+      width: 50px;
+      height: 50px;
+      border: 2px solid var(--primary);
+      opacity: 0.2;
+    }
+
+    .corner-deco.top-left {
+      top: 20px;
+      left: 20px;
+      border-right: none;
+      border-bottom: none;
+    }
+
+    .corner-deco.top-right {
+      top: 20px;
+      right: 20px;
+      border-left: none;
+      border-bottom: none;
+    }
+
+    .corner-deco.bottom-left {
+      bottom: 20px;
+      left: 20px;
+      border-right: none;
+      border-top: none;
+    }
+
+    .corner-deco.bottom-right {
+      bottom: 20px;
+      right: 20px;
+      border-left: none;
+      border-top: none;
+    }
+
+    /* 입력 폼 */
+    .input-panel {
+      width: 1280px;
+      background: var(--panel-bg);
+      backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 
+        0 10px 40px rgba(15, 23, 42, 0.1),
+        0 4px 12px rgba(15, 23, 42, 0.05),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .form-field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-field.full-width {
+      grid-column: 1 / -1;
+    }
+
+    .form-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .form-input {
+      background: rgba(255, 255, 255, 0.8);
+      border: 1.5px solid rgba(226, 232, 240, 0.8);
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: var(--text-primary);
+      font-size: 13px;
+      font-family: inherit;
+      transition: all 0.2s ease;
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+      resize: vertical;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+      background: rgba(255, 255, 255, 1);
+    }
+
+    .form-input::placeholder {
+      color: var(--text-secondary);
+      opacity: 0.5;
+    }
+
+    .tags-input-wrapper {
+      display: flex;
+      gap: 8px;
+    }
+
+    .tags-input-wrapper input {
+      flex: 1;
+    }
+
+    .add-tag-btn {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      border: none;
+      border-radius: 8px;
+      padding: 10px 18px;
+      color: white;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+    }
+
+    .add-tag-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+    }
+
+    .add-tag-btn:active {
+      transform: translateY(0);
+    }
+
+    /* 커스텀 폰트 */
+    .custom-font {
+      font-family: var(--custom-font, 'Noto Sans KR'), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    /* 슬라이더 스타일 */
+    .slider-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .slider {
+      flex: 1;
+      height: 6px;
+      -webkit-appearance: none;
+      appearance: none;
+      background: rgba(226, 232, 240, 0.5);
+      border-radius: 3px;
+      outline: none;
+    }
+
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(59, 130, 246, 0.4);
+      transition: all 0.2s ease;
+    }
+
+    .slider::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.5);
+    }
+
+    .slider::-moz-range-thumb {
+      width: 18px;
+      height: 18px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      border-radius: 50%;
+      cursor: pointer;
+      border: none;
+      box-shadow: 0 2px 6px rgba(59, 130, 246, 0.4);
+      transition: all 0.2s ease;
+    }
+
+    .slider::-moz-range-thumb:hover {
+      transform: scale(1.2);
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.5);
+    }
+
+    .slider-value {
+      min-width: 50px;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      background: rgba(59, 130, 246, 0.05);
+      padding: 4px 8px;
+      border-radius: 6px;
+    }
+
+
+  </style>
+</head>
+<body>
+  
+  
+  <div class="container">
+    <div class="frame">
+      <!-- 장식 요소 -->
+      <div class="corner-deco top-left"></div>
+      <div class="corner-deco top-right"></div>
+      <div class="corner-deco bottom-left"></div>
+      <div class="corner-deco bottom-right"></div>
+
+      <!-- 배경 -->
+      <div class="bg">
+        <img src="https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=1920&h=1080&fit=crop" alt="배경" data-editable-img data-editable-bg />
+      </div>
+
+      <!-- 캐릭터 영역 -->
+      <div class="character-area">
+        <img class="character-img" src="https://images.unsplash.com/photo-1618336753974-aae8e04506aa?w=600&h=800&fit=crop" alt="캐릭터" data-editable-img />
+      </div>
+
+      <!-- 우측 패널 -->
+      <aside class="panel custom-font">
+        <div class="panel-header">
+          <div class="profile-main">
+            <div class="avatar-wrapper">
+              <div class="avatar-glow"></div>
+              <img class="avatar" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&h=150&fit=crop" alt="아바타" data-editable-img />
+            </div>
+            <div class="profile-info">
+              <div class="username custom-font" id="displayUsername">닉네임(@ID)</div>
+              <div class="tags" id="displayTags">
+                <span class="tag custom-font">Bloom</span>
+              </div>
+              <div class="bio custom-font" id="displayBio">한줄 소개</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-content">
+          <div class="section">
+            <h3 class="section-title custom-font">주력 캐릭터</h3>
+            <div class="squad" id="squad"></div>
+          </div>
+
+          <div class="section">
+            <h3 class="section-title custom-font">자기 소개</h3>
+            <div class="info-card">
+              <div class="info-row">
+                <div class="info-label custom-font">선호</div>
+                <div class="info-value custom-font" id="displayLike">탕수육</div>
+              </div>
+              <div class="info-row">
+                <div class="info-label custom-font">불호</div>
+                <div class="info-value custom-font" id="displayDislike">부먹</div>
+              </div>
+              <div class="info-row">
+                <div class="info-label custom-font">트윗 성향</div>
+                <div class="info-value custom-font" id="displayPlatform">나이들어서개주접은못떰</div>
+              </div>
+              <div class="info-row">
+                <div class="info-label custom-font">취미</div>
+                <div class="info-value custom-font" id="displayHobby">{{char}} 갈구기</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <!-- 하단 입력 패널 (frame 밖) -->
+    <div class="input-panel">
+      <div class="form-grid">
+        <div class="form-field">
+          <label class="form-label">닉네임</label>
+          <input type="text" class="form-input" id="inputUsername" placeholder="닉네임 입력" value="닉네임(@ID)">
+        </div>
+        <div class="form-field">
+          <label class="form-label">한줄 소개</label>
+          <input type="text" class="form-input" id="inputBio" placeholder="간단한 소개" value="한줄 소개">
+        </div>
+        <div class="form-field full-width">
+          <label class="form-label">태그 추가 (클릭하면 삭제됨)</label>
+          <div class="tags-input-wrapper">
+            <input type="text" class="form-input" id="inputTag" placeholder="태그 입력 (Enter로 추가)">
+            <button class="add-tag-btn" id="addTagBtn">추가</button>
+          </div>
+        </div>
+        <div class="form-field">
+          <label class="form-label">선호</label>
+          <input type="text" class="form-input" id="inputLike" placeholder="선호하는 것" value="탕수육">
+        </div>
+        <div class="form-field">
+          <label class="form-label">불호</label>
+          <input type="text" class="form-input" id="inputDislike" placeholder="싫어하는 것" value="부먹">
+        </div>
+        <div class="form-field">
+          <label class="form-label">트윗 성향</label>
+          <input type="text" class="form-input" id="inputPlatform" placeholder="트윗 성향" value="나이들어서개주접은못떰">
+        </div>
+        <div class="form-field">
+          <label class="form-label">취미</label>
+          <input type="text" class="form-input" id="inputHobby" placeholder="취미" value="{{char}} 갈구기">
+        </div>
+        <div class="form-field">
+          <label class="form-label">캐릭터 X 위치</label>
+          <div class="slider-container">
+            <input type="range" class="slider" id="charX" min="0" max="800" value="40">
+            <span class="slider-value" id="charXValue">40px</span>
+          </div>
+        </div>
+        <div class="form-field">
+          <label class="form-label">캐릭터 Y 위치</label>
+          <div class="slider-container">
+            <input type="range" class="slider" id="charY" min="0" max="600" value="40">
+            <span class="slider-value" id="charYValue">40px</span>
+          </div>
+        </div>
+        <div class="form-field full-width">
+          <label class="form-label">폰트 CSS (@font-face 코드 붙여넣기)</label>
+          <textarea class="form-input" id="fontCss" rows="4" placeholder="예: @font-face { font-family: 'MyFont'; src: url('...') format('woff'); }"></textarea>
+        </div>
+        <div class="form-field">
+          <label class="form-label">폰트 크기 (%)</label>
+          <div class="slider-container">
+            <input type="range" class="slider" id="fontSize" min="80" max="150" value="100">
+            <span class="slider-value" id="fontSizeValue">100%</span>
+          </div>
+        </div>
+        <div class="form-field full-width" style="grid-column: 1 / -1;">
+          <label class="form-label">컬러 커스터마이징</label>
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
+            <div>
+              <label class="form-label" style="font-size: 10px; margin-bottom: 4px; display: block;">테마 컬러</label>
+              <input type="color" class="form-input" id="colorTheme" value="#3b82f6" style="height: 44px; cursor: pointer;">
+            </div>
+            <div>
+              <label class="form-label" style="font-size: 10px; margin-bottom: 4px; display: block;">패널 배경 컬러</label>
+              <input type="color" class="form-input" id="colorPanelBg" value="#ffffff" style="height: 44px; cursor: pointer;">
+            </div>
+            <div>
+              <label class="form-label" style="font-size: 10px; margin-bottom: 4px; display: block;">텍스트 컬러</label>
+              <input type="color" class="form-input" id="colorText" value="#0f172a" style="height: 44px; cursor: pointer;">
+            </div>
+            <div>
+              <label class="form-label" style="font-size: 10px; margin-bottom: 4px; display: block;">보조 텍스트 컬러</label>
+              <input type="color" class="form-input" id="colorTextSecondary" value="#64748b" style="height: 44px; cursor: pointer;">
+            </div>
+          </div>
+        </div>
+        <div class="form-field full-width">
+          <button id="saveBtn" style="
+            width: 100%;
+            background: linear-gradient(135deg, #10b981, #059669);
+            border: none;
+            border-radius: 8px;
+            padding: 14px 24px;
+            color: white;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+          ">📸 PNG로 저장하기</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 태그 관리
+    let userTags = ['Bloom'];
+
+    function updateTags() {
+      const tagsContainer = document.getElementById('displayTags');
+      tagsContainer.innerHTML = '';
+      userTags.forEach(tag => {
+        const span = document.createElement('span');
+        span.className = 'tag custom-font';
+        span.textContent = tag;
+        span.addEventListener('click', () => {
+          userTags = userTags.filter(t => t !== tag);
+          updateTags();
+        });
+        tagsContainer.appendChild(span);
+      });
+    }
+
+    // 태그 추가
+    function addTag() {
+      const input = document.getElementById('inputTag');
+      const tag = input.value.trim();
+      if (tag && !userTags.includes(tag)) {
+        userTags.push(tag);
+        updateTags();
+        input.value = '';
+      }
+    }
+
+    document.getElementById('addTagBtn').addEventListener('click', addTag);
+    document.getElementById('inputTag').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        addTag();
+      }
+    });
+
+    // 실시간 업데이트
+    document.getElementById('inputUsername').addEventListener('input', (e) => {
+      document.getElementById('displayUsername').textContent = e.target.value;
+    });
+
+    document.getElementById('inputBio').addEventListener('input', (e) => {
+      document.getElementById('displayBio').textContent = e.target.value;
+    });
+
+    document.getElementById('inputLike').addEventListener('input', (e) => {
+      document.getElementById('displayLike').textContent = e.target.value;
+    });
+
+    document.getElementById('inputDislike').addEventListener('input', (e) => {
+      document.getElementById('displayDislike').textContent = e.target.value;
+    });
+
+    document.getElementById('inputPlatform').addEventListener('input', (e) => {
+      document.getElementById('displayPlatform').textContent = e.target.value;
+    });
+
+    document.getElementById('inputHobby').addEventListener('input', (e) => {
+      document.getElementById('displayHobby').textContent = e.target.value;
+    });
+
+    // 캐릭터 위치 조절
+    const charArea = document.querySelector('.character-area');
+    const charXSlider = document.getElementById('charX');
+    const charYSlider = document.getElementById('charY');
+    const charXValue = document.getElementById('charXValue');
+    const charYValue = document.getElementById('charYValue');
+
+    charXSlider.addEventListener('input', (e) => {
+      const value = e.target.value;
+      charArea.style.left = value + 'px';
+      charXValue.textContent = value + 'px';
+    });
+
+    charYSlider.addEventListener('input', (e) => {
+      const value = e.target.value;
+      charArea.style.bottom = value + 'px';
+      charYValue.textContent = value + 'px';
+    });
+
+    // 폰트 CSS 적용
+    let customFontStyle = null;
+    document.getElementById('fontCss').addEventListener('input', (e) => {
+      const css = e.target.value.trim();
+      
+      if (customFontStyle) {
+        customFontStyle.remove();
+        customFontStyle = null;
+      }
+      
+      if (css) {
+        customFontStyle = document.createElement('style');
+        customFontStyle.textContent = css;
+        document.head.appendChild(customFontStyle);
+        
+        const match = css.match(/font-family:\s*['"]?([^'";}]+)['"]?/i);
+        if (match && match[1]) {
+          const fontName = match[1].trim();
+          document.documentElement.style.setProperty('--custom-font', `'${fontName}'`);
+        }
+      } else {
+        document.documentElement.style.setProperty('--custom-font', "'Noto Sans KR'");
+      }
+    });
+
+    // 폰트 크기 조절
+    const fontSizeSlider = document.getElementById('fontSize');
+    const fontSizeValue = document.getElementById('fontSizeValue');
+
+    fontSizeSlider.addEventListener('input', (e) => {
+      const value = e.target.value;
+      const panel = document.querySelector('.panel');
+      panel.style.fontSize = `${value}%`;
+      fontSizeValue.textContent = value + '%';
+    });
+
+    // 컬러 피커
+    document.getElementById('colorTheme').addEventListener('input', (e) => {
+      const color = e.target.value;
+      document.documentElement.style.setProperty('--primary', color);
+      document.documentElement.style.setProperty('--secondary', color + 'cc');
+      document.documentElement.style.setProperty('--accent', color);
+    });
+
+    document.getElementById('colorPanelBg').addEventListener('input', (e) => {
+      const color = e.target.value;
+      const r = parseInt(color.substr(1,2), 16);
+      const g = parseInt(color.substr(3,2), 16);
+      const b = parseInt(color.substr(5,2), 16);
+      document.documentElement.style.setProperty('--panel-bg', `rgba(${r}, ${g}, ${b}, 0.95)`);
+      document.documentElement.style.setProperty('--card-bg', `rgba(${r}, ${g}, ${b}, 0.98)`);
+    });
+
+    document.getElementById('colorText').addEventListener('input', (e) => {
+      const color = e.target.value;
+      document.documentElement.style.setProperty('--text-primary', color);
+    });
+
+    document.getElementById('colorTextSecondary').addEventListener('input', (e) => {
+      const color = e.target.value;
+      document.documentElement.style.setProperty('--text-secondary', color);
+    });
+
+    // 주력 캐릭터 샘플
+    const squadEl = document.getElementById('squad');
+    const sampleUnits = [
+      {img: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=150&h=150&fit=crop'},
+      {img: 'https://images.unsplash.com/photo-1589156280159-27698a70f29e?w=150&h=150&fit=crop'},
+      {img: 'https://images.unsplash.com/photo-1578632292335-df3abbb0d586?w=150&h=150&fit=crop'},
+      {img: 'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=150&h=150&fit=crop'},
+      {img: 'https://images.unsplash.com/photo-1589652717521-10c0d092dea9?w=150&h=150&fit=crop'}
+    ];
+
+    function makeUnit(u) {
+      const box = document.createElement('div');
+      box.className = 'unit';
+      const img = document.createElement('img');
+      img.setAttribute('data-editable-img', '');
+      img.alt = 'unit';
+      img.src = u.img || 'data:image/svg+xml;utf8,' + encodeURIComponent(
+        `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+          <rect width="100" height="100" fill="rgba(30,35,50,0.85)"/>
+          <text x="50" y="55" text-anchor="middle" font-size="12" fill="rgba(255,255,255,.4)" font-family="sans-serif">NO IMG</text>
+        </svg>`
+      );
+      box.appendChild(img);
+      return box;
+    }
+
+    sampleUnits.forEach(u => squadEl.appendChild(makeUnit(u)));
+
+    // 이미지 교체 기능
+    const hiddenInput = document.createElement('input');
+    hiddenInput.type = 'file';
+    hiddenInput.accept = 'image/*';
+    hiddenInput.style.display = 'none';
+    document.body.appendChild(hiddenInput);
+
+    let _targetImg = null, _prevURL = null;
+
+    function bindEditableImages() {
+      document.querySelectorAll('[data-editable-img]').forEach(img => {
+        if (img._bound) return;
+        img._bound = true;
+        img.style.cursor = 'pointer';
+        img.title = '이미지 변경 (클릭)';
+        img.addEventListener('click', e => {
+          e.stopPropagation();
+          _targetImg = img;
+          hiddenInput.click();
+        });
+      });
+    }
+
+    hiddenInput.addEventListener('change', () => {
+      const file = hiddenInput.files && hiddenInput.files[0];
+      if (!file || !_targetImg) return;
+      const url = URL.createObjectURL(file);
+      if (_prevURL) URL.revokeObjectURL(_prevURL);
+      _targetImg.src = url;
+      _prevURL = url;
+      _targetImg = null;
+      hiddenInput.value = '';
+    });
+
+    // 배경 클릭 교체
+    document.querySelectorAll('[data-editable-bg]').forEach(bg => {
+      const host = bg.parentElement;
+      host.style.cursor = 'pointer';
+      host.title = '배경 변경 (클릭)';
+      host.addEventListener('click', () => {
+        _targetImg = bg;
+        hiddenInput.click();
+      });
+    });
+
+    bindEditableImages();
+    const obs = new MutationObserver(bindEditableImages);
+    obs.observe(document.body, {childList: true, subtree: true});
+
+    // 페이지 로드 시 태그 초기화
+    updateTags();
+
+    // PNG 저장 기능
+    document.getElementById('saveBtn').addEventListener('click', async () => {
+      const frame = document.querySelector('.frame');
+      const btn = document.getElementById('saveBtn');
+      
+      btn.textContent = '⏳ 저장 중...';
+      btn.disabled = true;
+      btn.style.opacity = '0.7';
+      
+      try {
+        // html2canvas가 로드되었는지 확인
+        if (typeof html2canvas === 'undefined') {
+          throw new Error('html2canvas 라이브러리가 로드되지 않았습니다.');
+        }
+        
+        // 캡처
+        const canvas = await html2canvas(frame, {
+          backgroundColor: '#ffffff',
+          scale: 2,
+          logging: false,
+          useCORS: true,
+          allowTaint: true
+        });
+        
+        // 다운로드
+        canvas.toBlob((blob) => {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'tch-profile.png';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+          
+          btn.textContent = '✅ 저장 완료!';
+          btn.disabled = false;
+          setTimeout(() => {
+            btn.textContent = '📸 PNG로 저장하기';
+            btn.style.opacity = '1';
+          }, 2000);
+        });
+      } catch (err) {
+        console.error('저장 오류:', err);
+        alert('저장 중 오류가 발생했습니다. 콘솔을 확인해주세요.');
+        btn.textContent = '❌ 오류 발생';
+        btn.disabled = false;
+        setTimeout(() => {
+          btn.textContent = '📸 PNG로 저장하기';
+          btn.style.opacity = '1';
+        }, 2000);
+      }
+    });
+
+    // 저장 버튼 호버 효과
+    const saveBtn = document.getElementById('saveBtn');
+    saveBtn.addEventListener('mouseenter', () => {
+      saveBtn.style.transform = 'translateY(-2px)';
+      saveBtn.style.boxShadow = '0 6px 20px rgba(16, 185, 129, 0.4)';
+    });
+    saveBtn.addEventListener('mouseleave', () => {
+      saveBtn.style.transform = 'translateY(0)';
+      saveBtn.style.boxShadow = '0 4px 12px rgba(16, 185, 129, 0.3)';
+    });
+  </script>
+</body>
+</html>
